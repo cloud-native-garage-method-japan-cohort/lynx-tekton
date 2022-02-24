@@ -4,7 +4,7 @@ metadata:
   name: deployer
 subjects:
   - kind: ServiceAccount
-    name: build-bot
+    name: lynx-build-bot
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
