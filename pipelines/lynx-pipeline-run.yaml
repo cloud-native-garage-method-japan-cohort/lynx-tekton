@@ -4,26 +4,9 @@ metadata:
   generateName: lynx-frontend-run-
 spec:
   serviceAccountName: lynx-build-bot
-  # serviceAccountNames: 
-    # - serviceAccountName: build-bot
-      # taskName: update-image
   pipelineRef:
     name: lynx-pipeline
   workspaces:
     - name: pipeline-shared-data
       persistentVolumeClaim:
         claimName: lynx-pvc
-
-# ---
-# apiVersion: tekton.dev/v1beta1
-# kind: PipelineRun
-# metadata:
-#   generateName: andreas-kavountzis-pipeline-from-scratch-pipeline-run-
-# spec:
-#   serviceAccountName: build-bot
-#   pipelineRef:
-#     name: andreas-kavountzis-pipeline-from-scratch-pipeline
-#   workspaces:
-#     - name: pipeline-shared-data
-#       persistentVolumeClaim:
-#         claimName: andreas-kavountzis-pvc
