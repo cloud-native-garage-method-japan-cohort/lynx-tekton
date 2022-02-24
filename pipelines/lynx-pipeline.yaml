@@ -1,0 +1,96 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  annotations:
+    app.openshift.io/runtime: nodejs
+  name: lynx-pipeline
+spec:
+  workspaces:
+    - name: pipeline-shared-data
+      description: |
+        This workspace stores the cloned repository and is available to all steps
+  params:
+    - name: image-repo
+      type: string
+      description: Docker image name
+      default: quay.io/yusuke_muramatsu_ibm/frontend
+  tasks:
+    - name: clone-repository
+      params:
+        - name: url
+          value: https://github.com/cloud-native-garage-method-japan-cohort/lynx-frontend
+      taskRef:
+        kind: Task
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+    - name: npm-install
+      runAfter:
+        - clone-repository
+      params:
+        - name: ARGS
+          value: 
+            - clean-install
+      taskRef:
+        kind: Task
+        name: npm
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+    - name: test
+      runAfter:
+        - npm-install
+      params:
+        - name: ARGS
+          value: 
+            - test
+      taskRef:
+        kind: Task
+        name: npm
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+    - name: update-image
+      runAfter:
+        - "test"
+      taskRef:
+        kind: Task
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      params:
+        - name: IMAGE
+          value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
+    - name: kustomize-build
+      runAfter:
+        - "update-image"
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      params:
+        - name: image-with-tag
+          value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
+        - name: app-name
+          value: "lynx-frontend" #TODO: assing dinamicaly to support backend
+      taskRef:
+        kind: Task
+        name: kustomize-build
+    - name: test-deploy
+      runAfter:
+        - "kustomize-build"
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+      taskRef:
+        kind: Task
+        name: test-deploy
+      params:
+        - name: app-namespace
+          value: "$(context.pipelineRun.namespace)"
+        - name: app-name
+          value: "$(context.pipelineRun.namespace)"
+        
+
+
