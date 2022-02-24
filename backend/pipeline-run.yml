@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: lynx-app-backend-pipeline-run-
+spec:
+  serviceAccountNames:
+    - serviceAccountName: github-backend-account
+      taskName: clone-repository
+    - serviceAccountName: quayio-backend-account
+      taskName: build-image
+  pipelineRef:
+    name: lynx-pipeline-backend
+  params:
+    - name: gitrepo-clone-url
+      value: https://github.com/cloud-native-garage-method-japan-cohort/lynx-backend.git
+    - name: gitrepo-revision
+      value: main
+    - name: image-repo-base
+      value: quay.io
+    - name: image-repo-namespace
+      value: keita_watanabe4_ibm
+    - name: image-name
+      value: lynx-dev-bke
+    - name: image-tag
+      value: latest
+  workspaces:
+    - name: pipeline-shared-data
+      persistentVolumeClaim:
+        claimName: lynx-backend-pvc

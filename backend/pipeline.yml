@@ -1,0 +1,88 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: lynx-pipeline-backend
+spec:
+  workspaces:
+    - name: pipeline-shared-data
+      description: |
+        This workspace stores the cloned repository and is available to all steps
+  params:
+    - name: gitrepo-clone-url
+      type: string
+      description: image clone repository
+      default: localhost
+    - name: gitrepo-revision
+      type: string
+      description: revision to build
+      default: main
+    - name: gitrepo-context-dir
+      type: string
+      description: context directory to run Docker build.
+      default: ""
+    - name: image-repo-base
+      type: string
+      description: Docker image repository base url
+      default: quay.io
+    - name: image-repo-namespace
+      type: string
+      description: Docker image repository base url
+      default: keita_watanabe4_ibm
+    - name: image-name
+      type: string
+      description: Docker image name (without repository and namespace)
+    - name: image-tag
+      type: string
+      description: Docker image tag
+      default: latest
+  tasks:
+    - name: clone-repository
+      params:
+        - name: url
+          value: $(params.gitrepo-clone-url)
+        - name: revision
+          value: $(params.gitrepo-revision)
+      taskRef:
+        kind: Task
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-data
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: $(params.image-repo-base)/$(params.image-repo-namespace)/$(params.image-name):$(tasks.clone-repository.results.commit)
+      taskRef:
+        kind: Task
+        name: buildah
+      runAfter:
+        - clone-repository
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+    - name: manifest-build
+      runAfter:
+        - build-image
+      params:
+        - name: image-with-tag
+          value: $(params.image-repo-base)/$(params.image-repo-namespace)/$(params.image-name):$(tasks.clone-repository.results.commit)
+      taskRef:
+        kind: Task
+        name: kustomize-build
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
+    - name: deploy
+      runAfter:
+        - manifest-build
+      params:
+        - name: app-namespace
+          value: "$(context.pipelineRun.namespace)"
+        - name: app-name
+          value: "$(context.pipelineRun.namespace)"
+      taskRef:
+        kind: Task
+        name: test-deploy
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-data
