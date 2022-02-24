@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tekton-triggers-role-cl
+  namespace: lynx-dev
+rules:
+  - apiGroups:
+      - triggers.tekton.dev
+    resources:
+      - triggerbindings
+      - clusterinterceptors
+    verbs:
+      - get
+      - list
+      - watch

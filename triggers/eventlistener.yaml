@@ -1,0 +1,17 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: lynx-eventlistener
+spec:
+  serviceAccountName: tekton-triggers-sa
+  triggers:
+    - name: lynx-app-deploy
+      interceptors:
+        - github:
+            eventTypes: ["push"]
+        - cel:
+            filter: "body.repository.name == 'lynx-frontend' && body.ref.split('/')[2] == 'main'"
+      bindings:
+        - ref: lynx-pipeline-triggerbinding
+      template:
+        ref: lynx-triggertemplate
