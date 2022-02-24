@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   annotations:
     volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-block
-  name: lynx-pvc-2
+  name: lynx-pvc
   namespace: lynx-dev
 spec:
   accessModes:

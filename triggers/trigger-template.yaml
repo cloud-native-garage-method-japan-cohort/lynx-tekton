@@ -15,4 +15,4 @@ spec:
         workspaces:
           - name: pipeline-shared-data
             persistentVolumeClaim:
-              claimName: lynx-pvc-2
+              claimName: lynx-pvc
