@@ -3,12 +3,17 @@ kind: TriggerTemplate
 metadata:
   name: lynx-triggertemplate
 spec:
+  params:
+    - name: gitrepositoryname
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: lynx-frontend-run-
+        generateName: lynx-$(tt.params.gitrepositoryname)-run-
       spec:
+        params:
+          - name: image-repo
+            value: $(tt.params.gitrepositoryname)
         serviceAccountName: lynx-build-bot
         pipelineRef:
           name: lynx-pipeline

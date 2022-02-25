@@ -8,7 +8,7 @@ spec:
       description: contains image=image:tag in that format
     - name: app-name
       description: app name
-      default: lynx-frontend
+      default: lynx-image
   workspaces:
     - name: source
       description: contains the cloned git repo

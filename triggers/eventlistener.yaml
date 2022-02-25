@@ -10,7 +10,8 @@ spec:
         - github:
             eventTypes: ["push"]
         - cel:
-            filter: "body.repository.name == 'lynx-frontend' && body.ref.split('/')[2] == 'main'"
+            filter: "body.ref.split('/')[2] == 'main'"
+            # filter: "body.repository.name == 'lynx-frontend' && body.ref.split('/')[2] == 'main'"
       bindings:
         - ref: lynx-pipeline-triggerbinding
       template:

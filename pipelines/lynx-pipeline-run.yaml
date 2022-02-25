@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: lynx-frontend-run-
+  generateName: lynx-app-run-
 spec:
   serviceAccountName: lynx-build-bot
   pipelineRef:

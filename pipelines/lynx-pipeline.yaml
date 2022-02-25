@@ -13,12 +13,12 @@ spec:
     - name: image-repo
       type: string
       description: Docker image name
-      default: quay.io/yusuke_muramatsu_ibm/frontend
+      # default: quay.io/yusuke_muramatsu_ibm/
   tasks:
     - name: clone-repository
       params:
         - name: url
-          value: https://github.com/cloud-native-garage-method-japan-cohort/lynx-frontend
+          value: https://github.com/cloud-native-garage-method-japan-cohort/$(params.image-repo)
       taskRef:
         kind: Task
         name: git-clone
@@ -53,7 +53,7 @@ spec:
           workspace: pipeline-shared-data
     - name: update-image
       runAfter:
-        - "test"
+        - test
       taskRef:
         kind: Task
         name: buildah
@@ -62,7 +62,7 @@ spec:
           workspace: pipeline-shared-data
       params:
         - name: IMAGE
-          value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
+          value: "quay.io/yusuke_muramatsu_ibm/$(params.image-repo):$(tasks.clone-repository.results.commit)"
     - name: kustomize-build
       runAfter:
         - "update-image"
@@ -71,9 +71,9 @@ spec:
           workspace: pipeline-shared-data
       params:
         - name: image-with-tag
-          value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
-        - name: app-name
-          value: "lynx-frontend" #TODO: assing dinamicaly to support backend
+          value: "quay.io/yusuke_muramatsu_ibm/$(params.image-repo):$(tasks.clone-repository.results.commit)"
+        # - name: app-name
+        #   value: "lynx-frontend" #TODO: assing dinamicaly to support backend
       taskRef:
         kind: Task
         name: kustomize-build
