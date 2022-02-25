@@ -1,14 +1,7 @@
 apiVersion: v1
-imagePullSecrets:
-- name: lynx-build-bot-dockercfg-fhq8f
 kind: ServiceAccount
 metadata:
-  creationTimestamp: "2022-02-24T02:36:08Z"
   name: lynx-build-bot
-  namespace: lynx-dev
-  resourceVersion: "19010693"
-  uid: 2dcb4d80-f685-401b-837d-58cf3fc0bc17
 secrets:
-- name: lynx-secret-quay
-- name: lynx-build-bot-token-m7db6
-- name: lynx-build-bot-dockercfg-fhq8f
+  - name: lynx-secret-git
+  - name: lynx-secret-quay
